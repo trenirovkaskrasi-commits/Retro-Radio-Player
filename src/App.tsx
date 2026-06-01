@@ -128,7 +128,7 @@ export default function App() {
   };
 
   return (
-    <div className="hardware-body w-full h-[100dvh] max-h-[100dvh] flex flex-col relative items-center overflow-hidden pb-4 pt-[env(safe-area-inset-top,32px)]">
+    <div className="hardware-body w-full min-h-screen flex flex-col items-center overflow-x-hidden overflow-y-auto pb-8 pt-[env(safe-area-inset-top,40px)]">
       
       {/* Top Speaker Grill */}
       <div className="w-full max-w-[360px] mx-auto px-4 mt-2 flex-shrink-0">

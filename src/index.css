@@ -13,6 +13,11 @@
   --color-lcd-dim: rgba(26, 26, 26, 0.2);
 }
 
+html {
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
 @layer utilities {
   .hardware-body {
     background-color: #1a1a1a;

@@ -90,10 +90,7 @@ class AudioEngine {
         await MediaSession.setMetadata({
           title: station.name,
           artist: 'RetroStream Radio',
-          album: `${station.genre || 'Radio'} - ${station.country || 'Global'}`,
-          artwork: [
-            { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' }
-          ]
+          album: `${station.genre || 'Radio'} - ${station.country || 'Global'}`
         });
         await MediaSession.setPlaybackState({ playbackState: usePlayerStore.getState().isPlaying ? 'playing' : 'paused' });
       } catch (e) {
