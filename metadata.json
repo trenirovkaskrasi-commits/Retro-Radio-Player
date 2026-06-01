@@ -1,0 +1,6 @@
+{
+  "name": "RetroStream Internet Radio",
+  "description": "A retro-modern internet radio receiver PWA simulating tactile hardware with a monochrome LCD display and a rotary volume knob.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
