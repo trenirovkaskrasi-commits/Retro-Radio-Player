@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Station } from '../types';
 import { db } from '../storage/db';
+import { Capacitor } from '@capacitor/core';
 
 interface RadioState {
   favorites: Station[];
@@ -63,11 +64,35 @@ export const useRadioStore = create<RadioState>((set, get) => ({
 
   exportFavorites: async () => {
     const favs = await db.favorites.toArray();
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(favs));
-    const dlAnchorElem = document.createElement('a');
-    dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "retrostream_favorites.json");
-    dlAnchorElem.click();
+    const json = JSON.stringify(favs, null, 2);
+    
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
+        const { Share } = await import('@capacitor/share');
+        
+        const result = await Filesystem.writeFile({
+          path: 'retrostream_favorites.json',
+          data: json,
+          directory: Directory.Cache,
+          encoding: Encoding.UTF8,
+        });
+        
+        await Share.share({
+          title: 'RetroStream Favorites',
+          url: result.uri,
+          dialogTitle: 'Save Favorites to Device',
+        });
+      } catch (err) {
+        console.error('Export native failed', err);
+      }
+    } else {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(json);
+      const dlAnchorElem = document.createElement('a');
+      dlAnchorElem.setAttribute("href", dataStr);
+      dlAnchorElem.setAttribute("download", "retrostream_favorites.json");
+      dlAnchorElem.click();
+    }
   },
 
   importFavorites: async (file) => {
