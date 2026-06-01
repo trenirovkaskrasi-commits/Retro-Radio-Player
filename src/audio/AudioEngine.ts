@@ -2,6 +2,7 @@ import Hls from 'hls.js';
 import { Station } from '../types';
 import { usePlayerStore } from '../store/usePlayerStore';
 import { Capacitor } from '@capacitor/core';
+import { MediaSession } from '@capgo/capacitor-media-session';
 
 class AudioEngine {
   private static instance: AudioEngine;
@@ -51,28 +52,14 @@ class AudioEngine {
     });
 
     if (Capacitor.isNativePlatform()) {
-      setTimeout(() => {
-        const AudioPlayer = (window as any).plugins?.AudioPlayer || (window as any).Playlist;
-        if (AudioPlayer) {
-          AudioPlayer.on('status', (data: any) => {
-             const status = data.type || data.status || data.msgType;
-             if (status === 'playing' || status === 'canplay') {
-               usePlayerStore.getState().setBufferStatus('GOOD');
-               usePlayerStore.setState({ isPlaying: true, isLoading: false, isError: false });
-               this.reconnectAttempts = 0;
-             } else if (status === 'buffering' || status === 'loading') {
-               usePlayerStore.getState().setBufferStatus('LOW');
-               usePlayerStore.setState({ isLoading: true });
-             } else if (status === 'error') {
-               console.error('Native Audio error', data);
-               this.handleRecoverableError();
-             } else if (status === 'paused' || status === 'stopped') {
-               usePlayerStore.setState({ isPlaying: false, isLoading: false });
-               usePlayerStore.getState().setBufferStatus('IDLE');
-             }
-          });
-        }
-      }, 1000);
+      MediaSession.addListener('play', () => usePlayerStore.getState().play());
+      MediaSession.addListener('pause', () => usePlayerStore.getState().pause());
+      MediaSession.addListener('previoustrack', () => {
+        window.dispatchEvent(new CustomEvent('rs-previous-station'));
+      });
+      MediaSession.addListener('nexttrack', () => {
+        window.dispatchEvent(new CustomEvent('rs-next-station'));
+      });
     }
   }
 
@@ -97,8 +84,22 @@ class AudioEngine {
     }
   }
 
-  private updateMediaSession(station: Station | null) {
-    if ('mediaSession' in navigator && station) {
+  private async updateMediaSession(station: Station | null) {
+    if (Capacitor.isNativePlatform() && station) {
+      try {
+        await MediaSession.setMetadata({
+          title: station.name,
+          artist: 'RetroStream Radio',
+          album: `${station.genre || 'Radio'} - ${station.country || 'Global'}`,
+          artwork: [
+            { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' }
+          ]
+        });
+        await MediaSession.setPlaybackState({ playbackState: usePlayerStore.getState().isPlaying ? 'playing' : 'paused' });
+      } catch (e) {
+        console.error('MediaSession setMetadata error', e);
+      }
+    } else if ('mediaSession' in navigator && station) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: station.name,
         artist: 'RetroStream Radio',
@@ -113,7 +114,6 @@ class AudioEngine {
       navigator.mediaSession.setActionHandler('play', () => usePlayerStore.getState().play());
       navigator.mediaSession.setActionHandler('pause', () => usePlayerStore.getState().pause());
       navigator.mediaSession.setActionHandler('previoustrack', () => {
-        // We will tie this to the UI store later
         window.dispatchEvent(new CustomEvent('rs-previous-station'));
       });
       navigator.mediaSession.setActionHandler('nexttrack', () => {
@@ -126,10 +126,6 @@ class AudioEngine {
     if (typeof vol !== 'number' || isNaN(vol)) return;
     const norm = Math.max(0, Math.min(1, vol / 100));
     this.audio.volume = norm;
-    if (Capacitor.isNativePlatform()) {
-      const AudioPlayer = (window as any).plugins?.AudioPlayer || (window as any).Playlist;
-      if (AudioPlayer) AudioPlayer.setVolume(norm);
-    }
   }
 
   public async play(station?: Station) {
@@ -154,26 +150,6 @@ class AudioEngine {
 
       const url = targetStation.urlResolved || targetStation.url;
       const isHlsUrl = url.includes('.m3u8') || targetStation.hls;
-
-      if (Capacitor.isNativePlatform()) {
-        const AudioPlayer = (window as any).plugins?.AudioPlayer || (window as any).Playlist;
-        if (AudioPlayer) {
-          AudioPlayer.setPlaylistItems([
-            {
-              trackId: targetStation.id,
-              assetUrl: url,
-              albumArt: "/pwa-512x512.png",
-              artist: "RetroStream Radio",
-              album: targetStation.genre || targetStation.country || "Live Radio",
-              title: targetStation.name,
-              isStream: true
-            }
-          ], { resetStreamOnPause: true, playFromId: targetStation.id, startPaused: false });
-          
-          AudioPlayer.play();
-        }
-        return; // Bypass HTML5 audio
-      }
 
       if (isHlsUrl && Hls.isSupported()) {
         this.hls = new Hls({
@@ -210,14 +186,12 @@ class AudioEngine {
   }
 
   public pause() {
-    if (Capacitor.isNativePlatform()) {
-      const AudioPlayer = (window as any).plugins?.AudioPlayer || (window as any).Playlist;
-      if (AudioPlayer) AudioPlayer.pause();
-    } else {
-      this.audio.pause();
-    }
+    this.audio.pause();
     usePlayerStore.setState({ isPlaying: false, isLoading: false });
     usePlayerStore.getState().setBufferStatus('IDLE');
+    if (Capacitor.isNativePlatform()) {
+       MediaSession.setPlaybackState({ playbackState: 'paused' }).catch(() => {});
+    }
   }
 
   public stop() {

@@ -14,11 +14,11 @@
   "dependencies": {
     "@capacitor/app": "^8.1.0",
     "@capacitor/core": "^8.3.4",
+    "@capgo/capacitor-media-session": "^8.0.24",
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "clsx": "^2.1.1",
-    "cordova-plugin-playlist": "^0.10.0",
     "dexie": "^4.4.2",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
