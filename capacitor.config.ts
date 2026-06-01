@@ -5,7 +5,8 @@ const config: CapacitorConfig = {
   appName: 'RetroStream Radio',
   webDir: 'dist',
   server: {
-    cleartext: true
+    cleartext: true,
+    androidScheme: 'http'
   }
 };
 
