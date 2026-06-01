@@ -52,12 +52,12 @@ class AudioEngine {
     });
 
     if (Capacitor.isNativePlatform()) {
-      MediaSession.addListener('play', () => usePlayerStore.getState().play());
-      MediaSession.addListener('pause', () => usePlayerStore.getState().pause());
-      MediaSession.addListener('previoustrack', () => {
+      MediaSession.setActionHandler({ action: 'play' }, () => usePlayerStore.getState().play());
+      MediaSession.setActionHandler({ action: 'pause' }, () => usePlayerStore.getState().pause());
+      MediaSession.setActionHandler({ action: 'previoustrack' }, () => {
         window.dispatchEvent(new CustomEvent('rs-previous-station'));
       });
-      MediaSession.addListener('nexttrack', () => {
+      MediaSession.setActionHandler({ action: 'nexttrack' }, () => {
         window.dispatchEvent(new CustomEvent('rs-next-station'));
       });
     }
