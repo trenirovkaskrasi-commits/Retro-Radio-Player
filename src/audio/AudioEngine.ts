@@ -130,10 +130,13 @@ class AudioEngine {
     
     let targetStation = station;
     
-    // If no explicit station passed, but we have a current one and are in an error state,
-    // force a reload using the current station.
-    if (!targetStation && usePlayerStore.getState().isError) {
-      targetStation = usePlayerStore.getState().currentStation || undefined;
+    // If no explicit station passed, try to use currentStation from store
+    // if we are in an error state OR if no media is currently loaded (cold start)
+    if (!targetStation) {
+      const hasMediaLoaded = this.audio.src || this.hls;
+      if (usePlayerStore.getState().isError || !hasMediaLoaded) {
+        targetStation = usePlayerStore.getState().currentStation || undefined;
+      }
     }
     
     if (targetStation) {

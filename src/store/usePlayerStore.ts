@@ -2,12 +2,15 @@ import { create } from 'zustand';
 import { PlayerState } from '../types';
 import { engine } from '../audio/AudioEngine';
 
+const savedStationStr = localStorage.getItem('rs_last_station');
+const initialStation = savedStationStr ? JSON.parse(savedStationStr) : null;
+
 export const usePlayerStore = create<PlayerState>((set, get) => ({
   isPlaying: false,
   isLoading: false,
   isError: false,
   volume: 75,
-  currentStation: null,
+  currentStation: initialStation,
   bufferStatus: 'IDLE',
   playbackTime: 0,
   isMuted: false,
@@ -36,3 +39,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   
   updatePlaybackTime: () => set((state) => ({ playbackTime: state.playbackTime + 1 })),
 }));
+
+usePlayerStore.subscribe((state, prevState) => {
+  if (state.currentStation && state.currentStation.id !== prevState.currentStation?.id) {
+    localStorage.setItem('rs_last_station', JSON.stringify(state.currentStation));
+  }
+});
