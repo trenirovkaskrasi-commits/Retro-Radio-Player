@@ -142,6 +142,6 @@
 .gpu-marquee-text {
   display: inline-block;
   will-change: transform; 
-  animation: marqueeScroll 10s linear infinite;
+  animation: marqueeScroll 25s linear infinite;
 }
 
