@@ -12,6 +12,11 @@ export const LCDDisplay: React.FC = () => {
 
   const [isMarqueePlaying, setIsMarqueePlaying] = useState(true);
 
+  // Automatically start marquee when station changes
+  useEffect(() => {
+    setIsMarqueePlaying(true);
+  }, [currentStation?.id]);
+
   useEffect(() => {
     let timer: any;
     
@@ -79,7 +84,7 @@ export const LCDDisplay: React.FC = () => {
              <div className={`text-[36px] w-full font-lcd uppercase tracking-[0.04em] leading-none pt-3 pb-1 font-normal [text-shadow:0_0_1px_rgba(0,0,0,0.2)] ${!isMarqueePlaying && name.length > 9 ? 'text-left' : 'text-center'}`}>
                {name.length > 9 ? (
                  isMarqueePlaying ? (
-                  <div className="gpu-marquee-container">
+                  <div className="gpu-marquee-container" key={currentStation?.id || name}>
                     <div 
                       className="gpu-marquee-wrapper" 
                       style={{ animation: `seamlessMarquee ${Math.max(12, name.length * 0.8)}s linear 3` }}
