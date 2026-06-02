@@ -17,9 +17,9 @@ export const SearchPanel: React.FC<{ isOpen: boolean; onClose: () => void }> = (
       const api = new RadioBrowserApi("RetroStream PWA");
       
       const [byName, byCountry, byTag] = await Promise.all([
-        api.searchStations({ name: query, limit: 100, hideBroken: true }),
-        api.searchStations({ country: query, limit: 100, hideBroken: true }),
-        api.searchStations({ tag: query, limit: 100, hideBroken: true })
+        api.searchStations({ name: query, limit: 150, hideBroken: true, order: 'votes', reverse: true }),
+        api.searchStations({ country: query, limit: 150, hideBroken: true, order: 'votes', reverse: true }),
+        api.searchStations({ tag: query, limit: 150, hideBroken: true, order: 'votes', reverse: true })
       ]);
       
       const allStations = [...byName, ...byCountry, ...byTag];
