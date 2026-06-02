@@ -58,7 +58,7 @@ export const LCDDisplay: React.FC = () => {
           <div className="flex items-start mt-[-2px]">
              <RadioTower size={28} strokeWidth={2} className="text-[#111] opacity-90" />
           </div>
-          <span className="absolute left-1/2 -translate-x-1/2 font-sans font-medium text-[13px] tracking-wide text-[#111]">ОНЛАЙН РАДИО</span>
+          <span className="absolute left-1/2 -translate-x-1/2 font-sans font-bold text-[16px] tracking-wider text-[#111] mt-[-1px]">ОНЛАЙН РАДИО</span>
           <div className="flex flex-col items-end gap-[1px] leading-none text-[#111]">
             <div className="flex items-center gap-1.5 opacity-90">
               <Wifi size={14} strokeWidth={3} className={(isLoading || isPlaying) && !isError ? 'opacity-100' : 'opacity-20'} />
@@ -112,17 +112,17 @@ export const LCDDisplay: React.FC = () => {
             {isPlaying || isLoading ? formatTime(playbackTime) : '00:35'}
           </span>
           
-          <div className="flex-1 flex items-center gap-0.5 h-[12px] relative">
+          <div className="flex-1 flex items-center h-[12px] relative justify-center px-2">
              <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-[2px] bg-[#111]"></div>
-             <div className="flex gap-[3px] z-10 max-w-[40%] bg-[#ffb700] p-1">
-                {Array.from({ length: 8 }).map((_, i) => (
+             <div className="flex gap-[3px] z-10 bg-[#ffb700] px-1 py-1" style={{ clipPath: `inset(0 ${isPlaying ? '0%' : isLoading ? (blink ? '60%' : '30%') : '100%'} 0 0)`, transition: 'clip-path 0.3s ease-in-out' }}>
+                {Array.from({ length: 16 }).map((_, i) => (
                   <div key={i} className={`h-[10px] w-[6px] bg-[#111]`}></div>
                 ))}
              </div>
           </div>
           
           <span className="min-w-[45px] text-right text-[15px]">
-             --:--
+             {`${new Date().getDate().toString().padStart(2, '0')}/${(new Date().getMonth() + 1).toString().padStart(2, '0')}`}
           </span>
         </div>
       </div>
