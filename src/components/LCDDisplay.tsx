@@ -80,7 +80,14 @@ export const LCDDisplay: React.FC = () => {
                {name.length > 9 ? (
                  isMarqueePlaying ? (
                   <div className="gpu-marquee-container">
-                    <span className="gpu-marquee-text pr-12">{name} &nbsp;&nbsp;&nbsp;&nbsp; {name}</span>
+                    <div 
+                      className="gpu-marquee-wrapper" 
+                      style={{ animation: `seamlessMarquee ${Math.max(12, name.length * 0.8)}s linear 3` }}
+                      onAnimationEnd={() => setIsMarqueePlaying(false)}
+                    >
+                      <div className="pr-16">{name}</div>
+                      <div className="pr-16">{name}</div>
+                    </div>
                   </div>
                  ) : (
                    <div className="w-full truncate text-left">{name}</div>

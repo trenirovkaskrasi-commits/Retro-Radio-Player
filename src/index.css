@@ -134,19 +134,20 @@ html {
   display: none;
 }
 
-@keyframes marqueeScroll {
-  0% { transform: translate3d(100%, 0, 0); }
-  100% { transform: translate3d(-100%, 0, 0); }
+@keyframes seamlessMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
+
 .gpu-marquee-container {
   overflow: hidden;
   white-space: nowrap;
   width: 100%;
   position: relative;
 }
-.gpu-marquee-text {
-  display: inline-block;
-  will-change: transform; 
-  animation: marqueeScroll 30s linear infinite;
-}
 
+.gpu-marquee-wrapper {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
