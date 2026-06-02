@@ -12,10 +12,12 @@ export const LCDDisplay: React.FC = () => {
 
   const [isMarqueePlaying, setIsMarqueePlaying] = useState(true);
 
-  // Automatically start marquee when station changes
+  // Automatically start marquee when station changes or playback resumes
   useEffect(() => {
-    setIsMarqueePlaying(true);
-  }, [currentStation?.id]);
+    if (isPlaying || currentStation?.id) {
+      setIsMarqueePlaying(true);
+    }
+  }, [currentStation?.id, isPlaying]);
 
   useEffect(() => {
     let timer: any;

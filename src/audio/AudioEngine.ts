@@ -130,13 +130,11 @@ class AudioEngine {
     
     let targetStation = station;
     
-    // If no explicit station passed, try to use currentStation from store
-    // if we are in an error state OR if no media is currently loaded (cold start)
+    // For live radio, we cannot just 'resume' a suspended HTTP stream,
+    // because the server drops the connection after a few seconds of pause.
+    // We must always reload the current station when resuming.
     if (!targetStation) {
-      const hasMediaLoaded = this.audio.src || this.hls;
-      if (usePlayerStore.getState().isError || !hasMediaLoaded) {
-        targetStation = usePlayerStore.getState().currentStation || undefined;
-      }
+      targetStation = usePlayerStore.getState().currentStation || undefined;
     }
     
     if (targetStation) {
