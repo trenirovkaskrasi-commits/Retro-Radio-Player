@@ -41,7 +41,7 @@ export const TactileButton: React.FC<TactileButtonProps> = ({
         </div>
       </motion.button>
       {label && (
-        <span className="text-[11px] font-sans font-medium tracking-wide text-zinc-100 uppercase mt-0.5">
+        <span className="text-[12px] font-sans font-bold tracking-wider text-zinc-100 uppercase mt-1">
           {label}
         </span>
       )}

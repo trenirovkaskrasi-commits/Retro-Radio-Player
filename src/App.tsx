@@ -157,7 +157,7 @@ export default function App() {
              />
           </div>
           
-          <div className="flex-1 flex justify-center mt-2 z-10">
+          <div className="flex-1 flex justify-center mt-8 z-10">
             <Knob 
               min={0} 
               max={100} 

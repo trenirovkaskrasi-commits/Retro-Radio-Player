@@ -91,7 +91,7 @@ export const Knob: React.FC<KnobProps> = ({ value, onChange, onDoubleClick, min,
 
   return (
     <div className="flex flex-col items-center select-none w-full relative touch-none" ref={containerRef}>
-      <span className="absolute -top-8 text-[11px] font-semibold tracking-widest text-zinc-200 uppercase z-10">{label}</span>
+      <span className="absolute -top-11 text-[12px] font-bold tracking-widest text-zinc-200 uppercase z-10">{label}</span>
       
       <div className="relative w-[150px] h-[150px] flex items-center justify-center">
         {/* Tick marks ring */}
