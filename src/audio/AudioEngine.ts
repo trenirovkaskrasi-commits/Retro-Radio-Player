@@ -11,6 +11,7 @@ class AudioEngine {
   private reconnectAttempts = 0;
   private maxReconnects = 5;
   private reconnectTimeout: any = null;
+  private currentLoadedUrl: string = '';
   
   private constructor() {
     this.audio = new Audio();
@@ -150,23 +151,36 @@ class AudioEngine {
       const isHlsUrl = url.includes('.m3u8') || targetStation.hls;
 
       if (isHlsUrl && Hls.isSupported()) {
-        this.hls = new Hls({
-          maxBufferLength: 300, // 5 min buffer roughly
-          maxMaxBufferLength: 600,
-          liveSyncDurationCount: 7, // generous for stability
-        });
-        this.hls.loadSource(url);
-        this.hls.attachMedia(this.audio);
-        this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          this.audio.play().catch(console.error);
-        });
-        this.hls.on(Hls.Events.ERROR, (event, data) => {
-          if (data.fatal) {
-            this.handleRecoverableError();
+        if (this.currentLoadedUrl !== url || !this.hls) {
+          if (this.hls) {
+            this.hls.destroy();
+            this.hls = null;
           }
-        });
+          this.hls = new Hls({
+            maxBufferLength: 300,
+            maxMaxBufferLength: 600,
+            liveSyncDurationCount: 7,
+          });
+          this.hls.loadSource(url);
+          this.hls.attachMedia(this.audio);
+          this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            this.audio.play().catch(console.error);
+          });
+          this.hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+              this.handleRecoverableError();
+            }
+          });
+          this.currentLoadedUrl = url;
+        } else {
+          // Same HLS url, just resume
+          this.audio.play().catch(console.error);
+        }
       } else {
-        this.audio.src = url;
+        if (this.currentLoadedUrl !== url) {
+          this.audio.src = url;
+          this.currentLoadedUrl = url;
+        }
         this.audio.load();
         try {
           await this.audio.play();
